@@ -12,7 +12,7 @@
 <script>
     // this function is sending a POST request to the
     // controller to insert a SubTextPart
-    function InsertSubTextPart() {
+    function InsertSubTextPart(name, protect) {
  
         var sel = TXTextControl.selection
 
@@ -33,9 +33,9 @@
                             url: serviceURL,
                             contentType: 'application/json',
                             data: JSON.stringify({
-                                Name: 'Test1',
+                                Name: name,
                                 BinaryDocument: e.data,
-                                Protected: true
+                                Protected: protect
                             }),
                             success: successFunc,
                             error: errorFunc
