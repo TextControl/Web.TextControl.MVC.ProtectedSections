@@ -1,0 +1,72 @@
+﻿@using TXTextControl.Web
+@using TXTextControl.Web.MVC
+
+@Html.TXTextControl().TextControl().Render()
+
+<input onclick="InsertSubTextPart()" id="btnInsertSubTextPart" type="button" value="Insert Protected SubTextPart" />
+<br /><br />
+
+<label autocomplete="off" for="tbSubTextPartName">Active SubTextPart</label>
+<input id="tbSubTextPartName" type="text" />
+
+<script>
+    // this function is sending a POST request to the
+    // controller to insert a SubTextPart
+    function InsertSubTextPart() {
+ 
+        var sel = TXTextControl.selection
+
+        // check, if something has been selected
+        sel.getBounds(function (e) {
+            if (e.length == 0) {
+                alert('SubTextPart cannot be added - please select text.');
+                return;
+            }
+            else {
+                TXTextControl.saveSelection(
+                    TXTextControl.streamType.InternalUnicodeFormat, function (e) {
+
+                        var serviceURL = "/Home/InsertSubTextPart";
+
+                        $.ajax({
+                            type: "POST",
+                            url: serviceURL,
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                Name: 'Test1',
+                                BinaryDocument: e.data,
+                                Protected: true
+                            }),
+                            success: successFunc,
+                            error: errorFunc
+                        });
+
+                        function successFunc(data, status) {
+                            // load the created SubTextPart into the current Selection
+                            TXTextControl.loadSelection(
+                                TXTextControl.StreamType.InternalUnicodeFormat, data);
+                        }
+
+                        function errorFunc() {
+                            alert('Error');
+                        }
+                    });
+            }
+        })
+    }
+
+    // when entering the SubTextPart, check for the ID
+    // if 1 then set read and select
+    TXTextControl.addEventListener("subTextPartEntered", function (e) {
+        if (e.id == '1') {
+            TXTextControl.editMode = TXTextControl.EditMode.ReadAndSelect;
+            $('#tbSubTextPartName').val(e.name);
+        }
+    });
+
+    // set the edit mode to edit mode again
+    TXTextControl.addEventListener("subTextPartLeft", function (e) {
+        TXTextControl.editMode = TXTextControl.EditMode.Edit;
+        $('#tbSubTextPartName').val('');
+    });
+</script>
