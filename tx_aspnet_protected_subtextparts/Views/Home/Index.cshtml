@@ -17,8 +17,8 @@
         var sel = TXTextControl.selection
 
         // check, if something has been selected
-        sel.getBounds(function (e) {
-            if (e.length == 0) {
+        sel.getLength(function (e) {
+            if (e == 0) {
                 alert('SubTextPart cannot be added - please select text.');
                 return;
             }
@@ -55,18 +55,25 @@
         })
     }
 
+    TXTextControl.addEventListener("textControlLoaded", function (e) {
+        TXTextControl.addEventListener("subTextPartEntered", subTextPartEnteredHandler);
+        TXTextControl.addEventListener("subTextPartLeft", subTextPartLeftHandler);
+    });
+
     // when entering the SubTextPart, check for the ID
     // if 1 then set read and select
-    TXTextControl.addEventListener("subTextPartEntered", function (e) {
+
+    function subTextPartEnteredHandler(e) {
         if (e.id == '1') {
             TXTextControl.editMode = TXTextControl.EditMode.ReadAndSelect;
             $('#tbSubTextPartName').val(e.name);
         }
-    });
+    }
 
     // set the edit mode to edit mode again
-    TXTextControl.addEventListener("subTextPartLeft", function (e) {
+
+    function subTextPartLeftHandler(e) {
         TXTextControl.editMode = TXTextControl.EditMode.Edit;
         $('#tbSubTextPartName').val('');
-    });
+    }
 </script>
