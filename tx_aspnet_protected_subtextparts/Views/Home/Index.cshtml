@@ -3,7 +3,7 @@
 
 @Html.TXTextControl().TextControl().Render()
 
-<input onclick="InsertSubTextPart()" id="btnInsertSubTextPart" type="button" value="Insert Protected SubTextPart" />
+<input onclick="InsertSubTextPart(document.getElementById('tbSubTextPartName').value)" id="btnInsertSubTextPart" type="button" value="Insert Protected SubTextPart" />
 <br /><br />
 
 <label autocomplete="off" for="tbSubTextPartName">Active SubTextPart</label>
@@ -12,7 +12,7 @@
 <script>
     // this function is sending a POST request to the
     // controller to insert a SubTextPart
-    function InsertSubTextPart(name, protect) {
+    function InsertSubTextPart(name) {
  
         var sel = TXTextControl.selection
 
@@ -35,7 +35,7 @@
                             data: JSON.stringify({
                                 Name: name,
                                 BinaryDocument: e.data,
-                                Protected: protect
+                                Protected: true
                             }),
                             success: successFunc,
                             error: errorFunc
@@ -55,25 +55,20 @@
         })
     }
 
-    TXTextControl.addEventListener("textControlLoaded", function (e) {
-        TXTextControl.addEventListener("subTextPartEntered", subTextPartEnteredHandler);
-        TXTextControl.addEventListener("subTextPartLeft", subTextPartLeftHandler);
-    });
-
     // when entering the SubTextPart, check for the ID
     // if 1 then set read and select
+    TXTextControl.addEventListener("textControlLoaded", function () {
+        TXTextControl.addEventListener("subTextPartEntered", function (e) {
+            if (e.id == '1') {
+                TXTextControl.editMode = TXTextControl.EditMode.ReadAndSelect;
+                $('#tbSubTextPartName').val(e.name);
+            }
+        });
 
-    function subTextPartEnteredHandler(e) {
-        if (e.id == '1') {
-            TXTextControl.editMode = TXTextControl.EditMode.ReadAndSelect;
-            $('#tbSubTextPartName').val(e.name);
-        }
-    }
-
-    // set the edit mode to edit mode again
-
-    function subTextPartLeftHandler(e) {
-        TXTextControl.editMode = TXTextControl.EditMode.Edit;
-        $('#tbSubTextPartName').val('');
-    }
+        // set the edit mode to edit mode again
+        TXTextControl.addEventListener("subTextPartLeft", function (e) {
+            TXTextControl.editMode = TXTextControl.EditMode.Edit;
+            $('#tbSubTextPartName').val('');
+        });
+    });
 </script>
